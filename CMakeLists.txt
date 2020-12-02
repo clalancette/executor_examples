@@ -84,6 +84,38 @@ ament_target_dependencies(executor_multi_threaded_multiple_reentrant_cb_group
   rclcpp
 )
 
+add_executable(executor_multiple_executors_single_exclusive_cb_group
+  src/executor_multiple_executors_single_exclusive_cb_group.cpp
+)
+ament_target_dependencies(executor_multiple_executors_single_exclusive_cb_group
+  example_interfaces
+  rclcpp
+)
+
+add_executable(executor_multiple_executors_single_reentrant_cb_group
+  src/executor_multiple_executors_single_reentrant_cb_group.cpp
+)
+ament_target_dependencies(executor_multiple_executors_single_reentrant_cb_group
+  example_interfaces
+  rclcpp
+)
+
+add_executable(executor_multiple_executors_multiple_exclusive_cb_group
+  src/executor_multiple_executors_multiple_exclusive_cb_group.cpp
+)
+ament_target_dependencies(executor_multiple_executors_multiple_exclusive_cb_group
+  example_interfaces
+  rclcpp
+)
+
+add_executable(executor_multiple_executors_multiple_reentrant_cb_group
+  src/executor_multiple_executors_multiple_reentrant_cb_group.cpp
+)
+ament_target_dependencies(executor_multiple_executors_multiple_reentrant_cb_group
+  example_interfaces
+  rclcpp
+)
+
 install(TARGETS
   executor_single_threaded_single_exclusive_cb_group
   executor_single_threaded_multiple_exclusive_cb_group
@@ -94,6 +126,12 @@ install(TARGETS
   executor_single_threaded_multiple_reentrant_cb_group
   executor_multi_threaded_single_reentrant_cb_group
   executor_multi_threaded_multiple_reentrant_cb_group
+
+  executor_multiple_executors_single_exclusive_cb_group
+  executor_multiple_executors_single_reentrant_cb_group
+  executor_multiple_executors_multiple_exclusive_cb_group
+  executor_multiple_executors_multiple_reentrant_cb_group
+
   DESTINATION lib/${PROJECT_NAME}
 )
 
