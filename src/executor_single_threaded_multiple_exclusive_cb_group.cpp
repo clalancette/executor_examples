@@ -7,16 +7,17 @@
 #include "example_interfaces/srv/add_two_ints.hpp"
 #include "rclcpp/rclcpp.hpp"
 
-class SingleThreadedSingleExclusiveCBGroup final : public rclcpp::Node
+class SingleThreadedMultipleExclusiveCBGroup final : public rclcpp::Node
 {
 public:
-  SingleThreadedSingleExclusiveCBGroup()
-  : Node("single_threaded_single_exclusive_cb_group")
+  SingleThreadedMultipleExclusiveCBGroup()
+  : Node("single_threaded_multiple_exclusive_cb_group")
   {
-    cb_grp_ = this->create_callback_group(rclcpp::callback_group::CallbackGroupType::MutuallyExclusive);
-    client_ = this->create_client<example_interfaces::srv::AddTwoInts>("add_two_ints", rmw_qos_profile_services_default, cb_grp_);
+    cb_grp_client_ = this->create_callback_group(rclcpp::callback_group::CallbackGroupType::MutuallyExclusive);
+    client_ = this->create_client<example_interfaces::srv::AddTwoInts>("add_two_ints", rmw_qos_profile_services_default, cb_grp_client_);
+    cb_grp_timer_ = this->create_callback_group(rclcpp::callback_group::CallbackGroupType::MutuallyExclusive);
     timer_ = this->create_wall_timer(
-      std::chrono::milliseconds(500), std::bind(&SingleThreadedSingleExclusiveCBGroup::timer_callback, this), cb_grp_);
+      std::chrono::milliseconds(500), std::bind(&SingleThreadedMultipleExclusiveCBGroup::timer_callback, this), cb_grp_timer_);
   }
 
 private:
@@ -49,23 +50,23 @@ private:
     RCLCPP_INFO(this->get_logger(), "Future returned, result is %" PRId64, result->sum);
   }
 
-  rclcpp::callback_group::CallbackGroup::SharedPtr cb_grp_;
+  rclcpp::callback_group::CallbackGroup::SharedPtr cb_grp_client_;
   rclcpp::Client<example_interfaces::srv::AddTwoInts>::SharedPtr client_;
+  rclcpp::callback_group::CallbackGroup::SharedPtr cb_grp_timer_;
   rclcpp::TimerBase::SharedPtr timer_;
 };
 
 int main(int argc, char * argv[])
 {
-  fprintf(stderr, "This example has a timer callback and a service client, both in the same mutually\n");
-  fprintf(stderr, " exclusive callback group.  The executor is single-threaded.  The timer attempts to\n");
+  fprintf(stderr, "This example has a timer callback and a service client, in separate mutually\n");
+  fprintf(stderr, " exclusive callback groups.  The executor is single-threaded.  The timer attempts to\n");
   fprintf(stderr, " call the client and wait for the result, which leads to the client waiting forever.\n");
-  fprintf(stderr, " There are two reasons for this; the callback group used is exclusive (so only one of\n");
-  fprintf(stderr, " the callbacks within the group can be active at a time), and there is no executor\n");
-  fprintf(stderr, " thread available to service the service response.\n");
+  fprintf(stderr, " There is one reason for this; there is no executor thread available to service the\n");
+  fprintf(stderr, " service response.\n");
 
   rclcpp::init(argc, argv);
   rclcpp::executors::SingleThreadedExecutor exec;
-  auto service_caller = std::make_shared<SingleThreadedSingleExclusiveCBGroup>();
+  auto service_caller = std::make_shared<SingleThreadedMultipleExclusiveCBGroup>();
   exec.add_node(service_caller);
   exec.spin();
   rclcpp::shutdown();
