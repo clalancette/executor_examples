@@ -44,10 +44,19 @@ ament_target_dependencies(executor_multi_threaded_single_exclusive_cb_group
   rclcpp
 )
 
+add_executable(executor_multi_threaded_multiple_exclusive_cb_group
+  src/executor_multi_threaded_multiple_exclusive_cb_group.cpp
+)
+ament_target_dependencies(executor_multi_threaded_multiple_exclusive_cb_group
+  example_interfaces
+  rclcpp
+)
+
 install(TARGETS
   executor_single_threaded_single_exclusive_cb_group
   executor_single_threaded_multiple_exclusive_cb_group
   executor_multi_threaded_single_exclusive_cb_group
+  executor_multi_threaded_multiple_exclusive_cb_group
   DESTINATION lib/${PROJECT_NAME}
 )
 
